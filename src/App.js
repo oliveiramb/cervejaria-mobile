@@ -5,25 +5,38 @@ import {
   View,
   Text,
   TextInput,
-  FlatList
+  FlatList,
+  TouchableOpacity
 } from 'react-native';
+
+import api from './services/axios';
 
 const App = () => {
 
-  const [inputValue, setInputValue] = useState("Teste");
-  
-  const CERVEJAS = [
+  const CERVEJAS_MOCK = [
     {
-      id: 1,
       nome: "Cacilds",
       tipo: "Lager"
     },
     {
-      id: 2,
       nome: "Heineken",
       tipo: "Lager"
     }
   ]
+
+  const [inputValue, setInputValue] = useState("Teste");
+  const [cervejas, setCervejas] = useState(CERVEJAS_MOCK);
+
+  const getCervejas = async () => {
+    try{
+      const response = await api.get('/cervejas');
+      console.log(JSON.stringify(response));
+      setCervejas(response.data);
+    } catch (error) {
+      console.log("DEU RUIM" + error);
+    }
+    
+  }
 
   const TextCerveja = ({item}) => {
 
@@ -40,12 +53,15 @@ const App = () => {
     <>
       <View style={styles.container}>
         <Text style={styles.header}>Cervejaria Cervejas</Text>
-        <TextInput style={styles.input} value={inputValue} onChangeText={(value) => setInputValue(value)} />
+        <TextInput style={styles.input} />
+        <TouchableOpacity onPress={getCervejas}>
+          <Text>Butaaum</Text>
+        </TouchableOpacity>
         
         <FlatList
-        data={CERVEJAS}
+        data={cervejas}
         renderItem={TextCerveja}
-        keyExtractor={ cerveja => cerveja.id }
+        keyExtractor={ cerveja => cerveja.nome }
         
         
         ></FlatList>
@@ -59,16 +75,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     borderColor: 'blue',
-    borderWidth: 1
+    borderWidth: 1,
+    alignContent: 'center',
+    justifyContent: 'center'
   },
   header: {
     fontSize: 42
   },
   input:{
-    padding: 10,
-    borderColor:"#000000",
+    width: 100,
+    height: 40,
+    marginVertical: 10,
+    borderColor:'black',
     borderWidth: 1
-    
   }
 });
 
